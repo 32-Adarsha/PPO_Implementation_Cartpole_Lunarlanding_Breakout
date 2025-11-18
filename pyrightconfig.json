@@ -1,0 +1,14 @@
+
+{
+  "venvPath": ".",
+  "venv": "venv",                     // <-- change to "venv" if that's your folder
+  "pythonVersion": "3.11",             // optional but helpful
+  "reportMissingImports": true,
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "venv": ".venv",
+      "extraPaths": ["src"]            // remove if you don't use a src/ layout
+    }
+  ]
+}
