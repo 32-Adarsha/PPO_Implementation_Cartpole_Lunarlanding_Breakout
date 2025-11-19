@@ -1,0 +1,19 @@
+
+{
+    "seed": 9032,
+    "env_name": "CartPole-v1",
+    "display": true,
+    "display_episodes": 200,
+    "num_episodes": 1000,
+    "max_steps": 500,
+    "hidden_layers": [128, 128],
+    "activation_function": "relu",
+    "learning_rate": 0.001,
+    "gamma": 0.99,
+    "initial_epsilon": 1.0,
+    "min_epsilon": 0.05,
+    "decay_rate": 0.995,
+    "use_baseline": false,
+    "use_boltzmann": false
+}
+
