@@ -2,12 +2,10 @@ import os
 import json
 import numpy as np 
 import torch
-from torch import distributed, nn, values_copy
-from torch.nn.modules import adaptive
+import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-
 
 
 
@@ -63,7 +61,7 @@ class PPOAgent():
         self.max_step = cfg['max_step']
         self.max_episode = cfg['max_episode'] 
         self.batch_size = cfg['batch_size']
-        self.ppo_step = cfg['ppo_step']
+        self.ppo_step = cfg['ppo_step'] 
         self.n_Trials = cfg['N_Trials']
         self.reward_threshold = cfg['reward_threshold']
 
@@ -72,24 +70,21 @@ class PPOAgent():
 
         self.env = cfg['env']
 
+    
     def cal_reward(self, rewards):
-        dis_reward =  []
+        dis_reward = []
         prev_reward = 0
         for reward in reversed(rewards):
-            dis_reward.insert(0 , self.gamma*prev_reward + reward)
-            prev_reward = dis_reward[0] 
-        
-        dis_reward = torch.tensor(dis_reward)
-        
-        # NOTE: Normaized return 
-        dis_reward = (dis_reward - dis_reward.mean())/dis_reward.std()
+            prev_reward = self.gamma * prev_reward + reward
+            dis_reward.insert(0, prev_reward)
+        dis_reward = torch.tensor(dis_reward, dtype=torch.float32)
         return dis_reward
-        
+   
     
     def cal_advantage(self, rewards , values):
         advantages = rewards - values
         # NOTE: Normalized advantage
-        advantages = (advantages - advantages.mean()) / advantages.std()
+        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
         return advantages
         
     def cal_surrogate_loss(self , log_prob_old ,log_prob_new , advantages):
@@ -97,15 +92,16 @@ class PPOAgent():
         policy_ratio = ( log_prob_new - log_prob_old).exp()
         surrogate_loss_1 = policy_ratio * advantages
         surrogate_loss_2 = torch.clamp(policy_ratio, min=1.0-self.epsilon, max=1.0+self.epsilon) * advantages
-        surrogate_loss = torch.min(surrogate_loss_1, surrogate_loss_2)
+        surrogate_loss = torch.min(surrogate_loss_1, surrogate_loss_2).mean()
         return surrogate_loss
 
-    def cal_loss(self , surrogate_loss , enthropy , rewards , pred_value):
-        enthropy_bonus = self.enthropy_coff * enthropy
-        policy_loss = -(surrogate_loss + enthropy_bonus).sum()
-        value_loss =  F.smooth_l1_loss(rewards , pred_value).sum()
-        return policy_loss , value_loss
-    
+   
+    def cal_loss(self , surrogate_loss , entropy , rewards , pred_value):
+        entropy_bonus = self.enthropy_coff * entropy.mean()
+        policy_loss = -(surrogate_loss + entropy_bonus)
+        value_loss = F.smooth_l1_loss(pred_value, rewards)  
+        return policy_loss, value_loss
+
 
     def init_training(self):
         states = []
@@ -209,7 +205,7 @@ class PPOAgent():
             rewards , states , actions , old_log_p , advantage , dis_rewards = self.sample_trajectory()
             policy_loss , value_loss = self.update(states , actions , old_log_p , advantage , dis_rewards ) 
             policy_losses.append(policy_loss)
-            value_losses.append(value_losses)
+            value_losses.append(value_loss)
             train_rewards.append(rewards)
             test_reward = self.evaluate()
             test_rewards.append(test_reward)
