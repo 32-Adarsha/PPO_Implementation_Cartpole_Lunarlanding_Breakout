@@ -1,19 +1,86 @@
-
 {
-    "seed": 9032,
-    "env_name": "CartPole-v1",
-    "display": true,
-    "display_episodes": 200,
-    "num_episodes": 1000,
-    "max_steps": 500,
-    "hidden_layers": [128, 128],
-    "activation_function": "relu",
-    "learning_rate": 0.001,
-    "gamma": 0.99,
-    "initial_epsilon": 1.0,
-    "min_epsilon": 0.05,
-    "decay_rate": 0.995,
-    "use_baseline": false,
-    "use_boltzmann": false
+    "environments": {
+        "cartpole": {
+            "env_name": "CartPole-v1",
+            "observation_dim": 4,
+            "action_dim": 2,
+            "hidden_dim": 64,
+            "solved_threshold": 490.0,
+            "hyperparameters": {
+                "num_environments": 4,
+                "steps_per_iter": 128,
+                "epochs": 4,
+                "batch_size": 64,
+                "gamma": 0.99,
+                "gae_lambda_value": 0.95,
+                "learning_rate": 0.0003,
+                "value_coefficient": 0.5,
+                "entropy_coefficient": 0.01,
+                "gradient_clip": 0.5,
+                "max_iterations": 1000,
+                "clip_range": 0.2
+            }
+        },
+        "lunarlander": {
+            "env_name": "LunarLander-v3",
+            "observation_dim": 8,
+            "action_dim": 4,
+            "hidden_dim": 128,
+            "solved_threshold": 200.0,
+            "hyperparameters": {
+                "num_environments": 8,
+                "steps_per_iter": 256,
+                "epochs": 10,
+                "batch_size": 128,
+                "gamma": 0.99,
+                "gae_lambda_value": 0.95,
+                "learning_rate": 0.0003,
+                "value_coefficient": 0.5,
+                "entropy_coefficient": 0.01,
+                "gradient_clip": 0.5,
+                "max_iterations": 5000,
+                "clip_range": 0.2
+            }
+        },
+        "breakout": {
+            "env_name": "ALE/Breakout-v5",
+            "observation_shape": [
+                4,
+                84,
+                84
+            ],
+            "action_dim": 4,
+            "solved_threshold": 40.0,
+            "hyperparameters": {
+                "num_environments": 8,
+                "steps_per_iter": 128,
+                "epochs": 4,
+                "batch_size": 256,
+                "gamma": 0.99,
+                "gae_lambda_value": 0.95,
+                "learning_rate": 0.00025,
+                "value_coefficient": 0.5,
+                "entropy_coefficient": 0.01,
+                "gradient_clip": 0.5,
+                "max_iterations": 10000,
+                "clip_range": 0.1,
+                "frame_skip": 4,
+                "repeat_action_probability": 0.0
+            }
+        }
+    },
+    "training": {
+        "device": "cpu",
+        "save_frequency": 100,
+        "log_frequency": 10,
+        "eval_frequency": 50,
+        "num_eval_episodes": 10,
+        "seed": 42
+    },
+    "paths": {
+        "models_dir": "models",
+        "logs_dir": "logs",
+        "plots_dir": "plots"
+    },
+    "description": "Global configuration file for PPO training across different environments. Adjust hyperparameters based on environment complexity and available computational resources."
 }
-
