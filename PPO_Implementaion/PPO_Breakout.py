@@ -485,7 +485,7 @@ class PPOTrainer:
 
 def main():
     print("=" * 70)
-    print("PPO for Breakout - Refactored Implementation")
+    print("PPO for Breakout")
     print("=" * 70)
     print()
     
