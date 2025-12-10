@@ -61,6 +61,10 @@ cd PPO_Implementaion
 python PPO_Breakout.py
 ```
 
+## PPO Breakout Demo
+
+![PPO Breakout Demo](/Short_Video/breakout.gif)
+
 Training logs and model checkpoints will be saved automatically in the `logs/` and `models/` directories.
 
 ## Evaluating Models
